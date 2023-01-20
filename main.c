@@ -21,7 +21,7 @@ void get_mac_address(char *mac_address) {       //Creo le due struct che conterr
             char *interface_name = ifa->ifa_name;
             if (interface_name[0] == 'e' || interface_name[0] == 'w') {
                 struct sockaddr_ll *s = (struct sockaddr_ll*)ifa->ifa_addr;     //cast da iffadrs a sockaddr_ll
-                for (int i = 0; i < s->sll_halen; i++) {        //estrazione del valore MAC un byte alla volta...
+                for (int i = 0; i < 6; i++) {        //estrazione del valore MAC un byte alla volta...
                     sprintf(mac_address+i*3, "%02X:", s->sll_addr[i]);      //...perché è necessario costruire una sringa
                 }
                 mac_address[strlen(mac_address)-1] = '\0';  //rimozione dell'ultimo carattere ":"
