@@ -5,31 +5,31 @@
 #include <netpacket/packet.h>
 
 
-void get_mac_address(char *mac_address) {
+void get_mac_address(char *mac_address) {       //Creo le due struct che conterranno i dati delle interfacce
     struct ifaddrs *ifaddr, *ifa;
 
-    if (getifaddrs(&ifaddr) == -1) {        //Ogni interfaccia che non rispetta il controllo viene scartata
+    if (getifaddrs(&ifaddr) == -1) {    //il metodo crea una lista collegata di struct ifaddrs, inizializzando *ifaddr
         perror("Error getting interfaces");
         return;
     }
 
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {      //Questo ciclo for ha come side effect
-        if (ifa->ifa_addr == NULL)                              //la rimozione delle interfacce con dati non validi
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {      //iterazione su tutte le interfacce
+        if (ifa->ifa_addr == NULL)      //se l'interaffia corrrente non contiene i dati richiesti, essa viene scartata
             continue;
 
-        if ((ifa->ifa_flags & IFF_UP) && (ifa->ifa_addr->sa_family == AF_PACKET)) {     //ogni volta che un tentativo fallisce, si ritenta con la prossima interfaccia di ifa
+        if ((ifa->ifa_flags & IFF_UP) && (ifa->ifa_addr->sa_family == AF_PACKET)) {     //controllo se l'interfaccia è attiva ed è un AF_PACKET
             char *interface_name = ifa->ifa_name;
             if (interface_name[0] == 'e' || interface_name[0] == 'w') {
-                struct sockaddr_ll *s = (struct sockaddr_ll*)ifa->ifa_addr;
-                for (int i = 0; i < s->sll_halen; i++) {
-                    sprintf(mac_address+i*3, "%02X:", s->sll_addr[i]);
+                struct sockaddr_ll *s = (struct sockaddr_ll*)ifa->ifa_addr;     //cast da iffadrs a sockaddr_ll
+                for (int i = 0; i < s->sll_halen; i++) {        //estrazione del valore MAC un byte alla volta...
+                    sprintf(mac_address+i*3, "%02X:", s->sll_addr[i]);      //...perché è necessario costruire una sringa
                 }
-                mac_address[strlen(mac_address)-1] = '\0';
+                mac_address[strlen(mac_address)-1] = '\0';  //rimozione dell'ultimo carattere ":"
                 break;
             }
         }
     }
-    freeifaddrs(ifaddr);
+    freeifaddrs(ifaddr);       //liberazione dello spazzio utilizzato
 }
 
 int main() {
