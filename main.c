@@ -30,3 +30,10 @@ void getMacAddress(char *mac_address) {
         }
     }
 }
+
+int main() {
+    char mac_address[17];
+    getMacAddress(mac_address);
+    printf("MAC address: %s\n", mac_address);
+    return 0;
+}
